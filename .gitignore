@@ -1,0 +1,24 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+farmsim/node_modules
+farmsim/.pnp
+farmsim/.pnp.js
+
+# testing
+farmsim/coverage
+
+# production
+farmsim/build
+farmsim/static
+
+# misc
+farmsim/.DS_Store
+farmsim/.env.local
+farmsim/.env.development.local
+farmsim/.env.test.local
+farmsim/.env.production.local
+
+farmsim/npm-debug.log*
+farmsim/yarn-debug.log*
+farmsim/yarn-error.log*
