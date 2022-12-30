@@ -57,7 +57,7 @@ function AddAction() {
 	);
 }
 
-function IncomeTable(props: {data: IState, changeRecurringIncome: any, changeSingleIncome: any, changeExpenses: any}) {
+function IncomeTable(props: {data: IState, changeRecurringIncome: Function, changeSingleIncome: Function, changeExpenses: Function}) {
 
 	let rounds: JSX.Element[] = [];
 	for(let i=0; i<61; i++) {
@@ -178,9 +178,10 @@ class App extends React.Component<{}, IState> {
 			singleIncome: newIncome,
 		}, this.updateBalance);
 	}
-
+	componentDidMount() {
+		this.updateBalance();
+	}
 	render() {
-
 	return (
 		<div className="App">
 			<header className="App-header">
