@@ -34,11 +34,11 @@ function RoundInfo(props: {data: IState, children: number, changeRecurringIncome
 	return (
 		<tr>
 			<td>{round}</td>
-			<td><input min="0" type="number" defaultValue={props.data.bloonIncome[round]} /></td>
-			<td><input min="0" type="number" onChange={props.changeRecurringIncome} value={props.data.recurringIncome[round]}/></td>
-			<td><input min="0" type="number" onChange={props.changeSingleIncome} value={props.data.singleIncome[round]}/></td>
-			<td><input min="0" type="number" onChange={props.changeExpenses} value={props.data.expenses[round]}/></td>
-			<td><input min="0" type="number" readOnly={true} value={props.data.balances[round]} /></td>
+			<td><input className="readonly" type="text" inputMode="numeric" readOnly={true} defaultValue={props.data.bloonIncome[round]} /></td>
+			<td className="credit"><input min="0" type="text" inputMode="numeric" onChange={props.changeRecurringIncome} value={props.data.recurringIncome[round]}/></td>
+			<td className="credit"><input min="0" type="text" inputMode="numeric" onChange={props.changeSingleIncome} value={props.data.singleIncome[round]}/></td>
+			<td className="debit"><input min="0" type="text" inputMode="numeric" onChange={props.changeExpenses} value={props.data.expenses[round]}/></td>
+			<td><input className="readonly" type="text" inputMode="numeric" readOnly={true} value={props.data.balances[round]} /></td>
 			<td><ActionSummary/></td>
 		</tr>
 	)
@@ -46,14 +46,6 @@ function RoundInfo(props: {data: IState, children: number, changeRecurringIncome
 
 function ActionSummary() {
 	return (<textarea />
-	);
-}
-function AddAction() {
-	return (
-		<div className="AddAction">
-			<h1>Add Action</h1>
-			<input type="text" />
-		</div>
 	);
 }
 
@@ -138,7 +130,6 @@ class App extends React.Component<{}, IState> {
 		const value = parseInt(event.target.value);
 		const unchangedRecurringIncome = this.state.recurringIncome.slice(0, currentRound);
 		const newRecurringIncome = unchangedRecurringIncome.concat(Array(maxRound-currentRound).fill(value));
-		console.log(newRecurringIncome);
 		if(isNaN(value)) {
 			return;
 		}
@@ -158,7 +149,6 @@ class App extends React.Component<{}, IState> {
 		if(isNaN(value)) {
 			return;
 		}
-		console.log(newExpenses);
 		this.setState({
 			expenses: newExpenses,
 		}, this.updateBalance);
@@ -173,7 +163,6 @@ class App extends React.Component<{}, IState> {
 		let newIncome = oldIncome;
 		newIncome[currentRound] = value;
 
-		console.log(newIncome);
 		this.setState({
 			singleIncome: newIncome,
 		}, this.updateBalance);
@@ -195,7 +184,7 @@ class App extends React.Component<{}, IState> {
 				changeExpenses={(round: number, event: React.ChangeEvent<HTMLInputElement>) => this.changeExpenses(round, event)}
 
 				 />
-			<AddAction />
+			{/* <AddAction /> */}
 		</div>
 	);
 }
