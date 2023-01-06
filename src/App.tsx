@@ -127,12 +127,13 @@ class App extends React.Component<{}, IState> {
 		event.preventDefault();
 
 		const maxRound = 61;
-		const value = parseInt(event.target.value);
+		let value = parseInt(event.target.value);
+		if(isNaN(value)) {
+			value = 0;
+		}
+
 		const unchangedRecurringIncome = this.state.recurringIncome.slice(0, currentRound);
 		const newRecurringIncome = unchangedRecurringIncome.concat(Array(maxRound-currentRound).fill(value));
-		if(isNaN(value)) {
-			return;
-		}
 		this.setState({
 			recurringIncome: newRecurringIncome,
 		}, this.updateBalance);
@@ -147,7 +148,7 @@ class App extends React.Component<{}, IState> {
 		let newExpenses = oldExpenses;
 		newExpenses[currentRound] = value;
 		if(isNaN(value)) {
-			return;
+			newExpenses[currentRound] = 0;
 		}
 		this.setState({
 			expenses: newExpenses,
@@ -162,6 +163,9 @@ class App extends React.Component<{}, IState> {
 		const oldIncome = this.state.singleIncome.slice();
 		let newIncome = oldIncome;
 		newIncome[currentRound] = value;
+		if(isNaN(value)) {
+			newIncome[currentRound] = 0;
+		}
 
 		this.setState({
 			singleIncome: newIncome,
