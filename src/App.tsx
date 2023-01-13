@@ -1,5 +1,14 @@
 import React from 'react';
+
 import './App.css';
+import '@fontsource/roboto/300.css';
+import '@fontsource/roboto/400.css';
+import '@fontsource/roboto/500.css';
+import '@fontsource/roboto/700.css';
+import Towers, {Tower} from './config/Towers';
+import Button from '@mui/material/Button';
+import Autocomplete from '@mui/material/Autocomplete'
+
 
 function Checkbox(props: {id: string, children: string}) {
 	return (
@@ -91,8 +100,10 @@ interface IState {
 	singleIncome: Array<number>, 
 	expenses: Array<number>, 
 	balances: Array<number>,
-
+	towers: Array<Tower>,
 }
+
+
 class App extends React.Component<{}, IState> {
 	constructor(props: any) {
 		super(props);
@@ -102,6 +113,7 @@ class App extends React.Component<{}, IState> {
 			singleIncome: Array(61).fill(0),
 			expenses: Array(61).fill(0),
 			balances: Array(61).fill(0),
+			towers: [],
 
 
 		}
@@ -179,6 +191,8 @@ class App extends React.Component<{}, IState> {
 		<div className="App">
 			<header className="App-header">
 				<h1>BTD6 Income Simulator</h1>
+				<p>{Towers.length}</p>
+				<Button variant="outlined">foo</Button>
 			</header>
 			<Settings />
 			<IncomeTable 
