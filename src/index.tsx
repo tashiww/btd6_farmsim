@@ -5,6 +5,7 @@ import CssBaseline from '@mui/material/CssBaseline';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
+import Modes from './config/Modes'
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
@@ -13,7 +14,7 @@ root.render(
   <React.StrictMode>
     <CssBaseline enableColorScheme />
 
-    <App />
+    <App Modes={Modes}/>
   </React.StrictMode>
 );
 

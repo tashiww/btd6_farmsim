@@ -8,7 +8,8 @@ import '@fontsource/roboto/700.css';
 import Towers, {Tower} from './config/Towers';
 import Button from '@mui/material/Button';
 import Autocomplete from '@mui/material/Autocomplete'
-
+import Asset from './types/Asset'
+import RoundAssets from './components/RoundAssets'
 
 function Checkbox(props: {id: string, children: string}) {
 	return (
@@ -36,7 +37,7 @@ function Settings() {
 	);
 
 }
-function RoundInfo(props: {data: IState, children: number, changeRecurringIncome: any, changeSingleIncome: any, changeExpenses: any}) {
+function RoundInfo(props: {data: IState, assetList: Asset[], children: number, changeRecurringIncome: any, changeSingleIncome: any, addTower: any, changeExpenses: any}) {
 	let round = props.children;
 
 
@@ -49,6 +50,9 @@ function RoundInfo(props: {data: IState, children: number, changeRecurringIncome
 			<td className="debit"><input min="0" type="text" inputMode="numeric" onChange={props.changeExpenses} value={props.data.expenses[round]}/></td>
 			<td><input className="readonly" type="text" inputMode="numeric" readOnly={true} value={props.data.balances[round]} /></td>
 			<td><ActionSummary/></td>
+			<td><RoundAssets currentRound={round} assetList={props.assetList} /></td>
+			<td><Button onClick={(event: any) => props.addTower(event)} variant="contained">add_tower</Button></td>
+
 		</tr>
 	)
 }
@@ -58,15 +62,18 @@ function ActionSummary() {
 	);
 }
 
-function IncomeTable(props: {data: IState, changeRecurringIncome: Function, changeSingleIncome: Function, changeExpenses: Function}) {
+function IncomeTable(props: {data: IState, assetList: Asset[], endRound: number, addTower: any, changeRecurringIncome: Function, changeSingleIncome: Function, changeExpenses: Function}) {
 
 	let rounds: JSX.Element[] = [];
-	for(let i=0; i<61; i++) {
+	for(let i=0; i<props.endRound; i++) {
 		rounds = rounds.concat(
 		<RoundInfo 
+			addTower={(event: any) => props.addTower(i, event)}
 			changeRecurringIncome={(event: React.ChangeEvent<HTMLInputElement>) => props.changeRecurringIncome(i, event)} key={i} data={props.data}
 			changeSingleIncome={(event: React.ChangeEvent<HTMLInputElement>) => props.changeSingleIncome(i, event)}
-			changeExpenses={(event: React.ChangeEvent<HTMLInputElement>) => props.changeExpenses(i, event)}>
+			changeExpenses={(event: React.ChangeEvent<HTMLInputElement>) => props.changeExpenses(i, event)}
+			assetList={props.assetList}
+		>
 				{i}
 		</RoundInfo>
 		)
@@ -84,6 +91,8 @@ function IncomeTable(props: {data: IState, changeRecurringIncome: Function, chan
 						<th>Expenses</th>
 						<th>Balance</th>
 						<th>Action Log</th>
+						<th>Buy / Upgrade / Sell</th>
+						<th></th>
 					</tr>
 					</thead>
 					<tbody>
@@ -100,19 +109,20 @@ interface IState {
 	singleIncome: Array<number>, 
 	expenses: Array<number>, 
 	balances: Array<number>,
-	towers: Array<Tower>,
+	towers: Array<Asset>,
 }
 
 
-class App extends React.Component<{}, IState> {
+class App extends React.Component<any, IState> {
 	constructor(props: any) {
 		super(props);
+		const endRound = this.props.Modes.medium.endround;
 		this.state = {
 			bloonIncome: [850,121,137,138,175,164,163,182,200,199,314,189,192,282,259,266,268,165,358,260,186,351,298,277,167,335,333,662,266,389,337,537,627,205,912,1150,896,1339,1277,1759,521,2181,659,1278,1294,2422,716,1637,2843,4758,3016,1098.5,1595.5,924.5,2197.5,2483,1286.5,1859,2298,2159, 922.5],
-			recurringIncome: Array(61).fill(0),
-			singleIncome: Array(61).fill(0),
-			expenses: Array(61).fill(0),
-			balances: Array(61).fill(0),
+			recurringIncome: Array(endRound).fill(0),
+			singleIncome: Array(endRound).fill(0),
+			expenses: Array(endRound).fill(0),
+			balances: Array(endRound).fill(0),
 			towers: [],
 
 
@@ -122,7 +132,7 @@ class App extends React.Component<{}, IState> {
 
 	updateBalance() {
 		let balances: number[] = [];
-		for(let i=0;i<61;i++) { 
+		for(let i=0;i<this.props.Modes.medium.endround;i++) { 
 			let roundBalance =
 			this.state.bloonIncome.slice(0, i+1).reduce((a, b) => a + b, 0) + 
 			this.state.recurringIncome.slice(0, i+1).reduce((a, b) => a + b, 0) + 
@@ -134,18 +144,17 @@ class App extends React.Component<{}, IState> {
 			balances: balances,
 		});
 	}
-	changeRecurringIncome(currentRound: number, event: React.ChangeEvent<HTMLInputElement>): void {
+	changeRecurringIncome(endRound: number, currentRound: number, event: React.ChangeEvent<HTMLInputElement>): void {
 		event.stopPropagation();
 		event.preventDefault();
 
-		const maxRound = 61;
 		let value = parseInt(event.target.value);
 		if(isNaN(value)) {
 			value = 0;
 		}
 
 		const unchangedRecurringIncome = this.state.recurringIncome.slice(0, currentRound);
-		const newRecurringIncome = unchangedRecurringIncome.concat(Array(maxRound-currentRound).fill(value));
+		const newRecurringIncome = unchangedRecurringIncome.concat(Array(endRound-currentRound).fill(value));
 		this.setState({
 			recurringIncome: newRecurringIncome,
 		}, this.updateBalance);
@@ -183,21 +192,31 @@ class App extends React.Component<{}, IState> {
 			singleIncome: newIncome,
 		}, this.updateBalance);
 	}
+	addTower(currentRound: number, event: React.ChangeEvent<HTMLInputElement>): void {
+		const dummy = { towerId: 0, upgrades: [0, 0, 0], purchasedRound: currentRound, purchasedPrice: 270} as Asset;
+		this.setState(prevState => ({
+			towers: [...prevState.towers, dummy],
+		}));
+	}
 	componentDidMount() {
 		this.updateBalance();
 	}
+	
 	render() {
+		// console.log(this.props);
 	return (
 		<div className="App">
 			<header className="App-header">
 				<h1>BTD6 Income Simulator</h1>
-				<p>{Towers.length}</p>
-				<Button variant="outlined">foo</Button>
+				{/* <p>{JSON.stringify(this.state.towers)}</p> */}
 			</header>
 			<Settings />
 			<IncomeTable 
+				assetList={this.state.towers}
+				endRound={this.props.Modes.medium.endround}
 				data={this.state}
-				changeRecurringIncome={(round: number, event: React.ChangeEvent<HTMLInputElement>) => this.changeRecurringIncome(round, event)}
+				addTower={(round: number, event: React.ChangeEvent<HTMLInputElement>) => this.addTower(round, event)}
+				changeRecurringIncome={(round: number, event: React.ChangeEvent<HTMLInputElement>) => this.changeRecurringIncome(this.props.Modes.medium.endround,round, event)}
 				changeSingleIncome={(round: number, event: React.ChangeEvent<HTMLInputElement>) => this.changeSingleIncome(round, event)}
 				changeExpenses={(round: number, event: React.ChangeEvent<HTMLInputElement>) => this.changeExpenses(round, event)}
 

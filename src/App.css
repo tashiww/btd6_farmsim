@@ -19,12 +19,13 @@
   flex-wrap: wrap;
   align-items: center;
   justify-content: center;
-  font-size: calc(10px + 2vmin);
   color: white;
 }
 .App-header h1 {
   margin: 0px;
   padding: 0px;
+  font-size: 3em;
+
 }
 
 .Settings {
@@ -101,4 +102,8 @@ text-align: center;
 }
 .debit {
   background-color: rgba(222, 80, 80, 0.2);
+}
+
+.RoundAssets table {
+  text-align: center;
 }
