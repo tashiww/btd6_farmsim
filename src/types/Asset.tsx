@@ -1,4 +1,5 @@
 type Asset = {
+	index: number,
 	towerId: number,
 	upgrades: [number, number, number],
 	purchasedRound: number,
