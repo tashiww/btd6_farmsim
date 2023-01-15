@@ -8,6 +8,7 @@ import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import Asset from '../types/Asset'
 import Towers from '../config/Towers';
+import BuyTowerDialog from './BuyTowerDialog';
 
 
 function AssetRow(props: {name: string, sellValue: number,upgradable: boolean, salable: boolean}) {
@@ -53,7 +54,7 @@ function AssetTable(props: {validAssetList: Asset[]}) {
 	);
 }
 
-export default function RoundAssets(props: {currentRound: number, assetList: Asset[]}) {
+export default function RoundAssets(props: {currentRound: number, assetList: Asset[], addTower: any,}) {
   const [open, setOpen] = React.useState(false);
 
   const handleClickOpen = () => {
@@ -85,8 +86,8 @@ export default function RoundAssets(props: {currentRound: number, assetList: Ass
 			<AssetTable validAssetList={roundAssets} />
             </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose}>Buy</Button>
-          <Button onClick={handleClose}>Sell</Button>
+			<BuyTowerDialog addTower={props.addTower} currentRound={props.currentRound}  />
+	          <Button onClick={handleClose}>Sell</Button>
         </DialogActions>
       </Dialog>
     </div>

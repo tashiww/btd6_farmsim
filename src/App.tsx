@@ -50,8 +50,8 @@ function RoundInfo(props: {data: IState, assetList: Asset[], children: number, c
 			<td className="debit"><input min="0" type="text" inputMode="numeric" onChange={props.changeExpenses} value={props.data.expenses[round]}/></td>
 			<td><input className="readonly" type="text" inputMode="numeric" readOnly={true} value={props.data.balances[round]} /></td>
 			<td><ActionSummary/></td>
-			<td><RoundAssets currentRound={round} assetList={props.assetList} /></td>
-			<td><Button onClick={(event: any) => props.addTower(event)} variant="contained">add_tower</Button></td>
+			<td><RoundAssets addTower={(event: any) => props.addTower(event)}  currentRound={round} assetList={props.assetList} /></td>
+			{/* <td><Button onClick={(event: any) => props.addTower(event)} variant="contained">add_tower</Button></td> */}
 
 		</tr>
 	)
@@ -171,9 +171,19 @@ class App extends React.Component<any, IState> {
 		if(isNaN(value)) {
 			newExpenses[currentRound] = 0;
 		}
-		this.setState({
+		this.setState((prevState) => ({
 			expenses: newExpenses,
-		}, this.updateBalance);
+		}), this.updateBalance);
+	}
+
+	addExpense(currentRound: number, amount: number) {
+		const oldExpenses = this.state.expenses.slice();
+		let newExpenses = oldExpenses;
+		newExpenses[currentRound] += amount;
+
+		this.setState((prevState) => ({
+			expenses: newExpenses,
+		}), this.updateBalance);
 	}
 
 	changeSingleIncome(currentRound: number, event: React.ChangeEvent<HTMLInputElement>): void {
@@ -192,11 +202,13 @@ class App extends React.Component<any, IState> {
 			singleIncome: newIncome,
 		}, this.updateBalance);
 	}
-	addTower(currentRound: number, event: React.ChangeEvent<HTMLInputElement>): void {
-		const dummy = { towerId: 0, upgrades: [0, 0, 0], purchasedRound: currentRound, purchasedPrice: 270} as Asset;
+	addTower(currentRound: number, event: any): void {
+		const towerId = event.target.dataset.towerid;
+		const cost = Towers[towerId].cost;
+		const dummy = { towerId: towerId, upgrades: [0, 0, 0], purchasedRound: currentRound, purchasedPrice: cost} as Asset;
 		this.setState(prevState => ({
 			towers: [...prevState.towers, dummy],
-		}));
+		}), () => this.addExpense(currentRound, cost));
 	}
 	componentDidMount() {
 		this.updateBalance();
@@ -215,7 +227,7 @@ class App extends React.Component<any, IState> {
 				assetList={this.state.towers}
 				endRound={this.props.Modes.medium.endround}
 				data={this.state}
-				addTower={(round: number, event: React.ChangeEvent<HTMLInputElement>) => this.addTower(round, event)}
+				addTower={(round: number, event: any) => this.addTower(round, event)}
 				changeRecurringIncome={(round: number, event: React.ChangeEvent<HTMLInputElement>) => this.changeRecurringIncome(this.props.Modes.medium.endround,round, event)}
 				changeSingleIncome={(round: number, event: React.ChangeEvent<HTMLInputElement>) => this.changeSingleIncome(round, event)}
 				changeExpenses={(round: number, event: React.ChangeEvent<HTMLInputElement>) => this.changeExpenses(round, event)}
