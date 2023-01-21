@@ -16,7 +16,7 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 function UpgradeTower(props: {assetIndex: number, name: string, upgradable: boolean, clickHandler: any, upgradeTier: number, upgradePath: number, asset: Asset}) {
 
 	return (
-		<Button disabled={!props.upgradable} data-asset_index={props.assetIndex} data-upgrade_path={props.upgradePath} data-upgrade_tier={props.upgradeTier+1} key={props.upgradePath} onClick={props.clickHandler}>
+		<Button variant="contained" disabled={!props.upgradable} data-asset_index={props.assetIndex} data-upgrade_path={props.upgradePath} data-upgrade_tier={props.upgradeTier+1} key={props.upgradePath} onClick={props.clickHandler}>
     {props.name}
     </Button>
 	);

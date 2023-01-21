@@ -135,3 +135,7 @@ text-align: center;
   display: flex;
   flex-direction: column;
 }
+
+.UpgradeTower button {
+  margin: 5px;
+}
