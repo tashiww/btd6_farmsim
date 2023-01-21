@@ -9,6 +9,7 @@
   display: flex;
   width: 100%;
   flex-wrap: wrap;
+  justify-content: center;
 }
 
 .App-header {
@@ -106,4 +107,31 @@ text-align: center;
 
 .RoundAssets table {
   text-align: center;
+}
+
+.BuyTower {
+  padding: 5px;
+  margin: 5px;
+  list-style-type: none;
+  display: flex;
+  flex-wrap: wrap;
+  text-align: center;
+  justify-content: center;
+}
+
+.BuyTower>li:hover {
+  background-color: #ccc;
+}
+.BuyTower>li {
+  padding: 5px;
+  margin: 5px;
+  list-style-type: none;
+  border: 1px solid black;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.UpgradeTower {
+  display: flex;
+  flex-direction: column;
 }

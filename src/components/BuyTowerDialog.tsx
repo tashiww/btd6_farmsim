@@ -8,6 +8,9 @@ import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import Asset from '../types/Asset'
 import Towers from '../config/Towers';
+import Checkbox from '@mui/material/Checkbox';
+import FormGroup from '@mui/material/FormGroup';
+import FormControlLabel from '@mui/material/FormControlLabel';
 
 
 function BuyTower(props: {towerId: number, clickHandler: any}) {
@@ -25,7 +28,7 @@ function BuyTable(props: {addTower: any}) {
 	});
 	
 	return (
-<ul>
+<ul className="BuyTower" >
 {buyTowers}
 	</ul>
 	);
@@ -33,6 +36,8 @@ function BuyTable(props: {addTower: any}) {
 
 export default function BuyTowerDialog(props: {currentRound: number, addTower: any}) {
   const [open, setOpen] = React.useState(false);
+
+  const [multibuy, setMultibuy] = React.useState(false);
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -43,6 +48,11 @@ export default function BuyTowerDialog(props: {currentRound: number, addTower: a
   };
 
   let roundAssets: Asset[] = [];
+
+  const handleCheck = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setMultibuy(event.target.checked);
+  };
+
 
   return (
     <div className='RoundAssets'>
@@ -55,7 +65,10 @@ export default function BuyTowerDialog(props: {currentRound: number, addTower: a
 			<BuyTable addTower={props.addTower}/>
             </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose}>Buy</Button>
+        <FormGroup>
+          <FormControlLabel control={<Checkbox onChange={handleCheck} />} label="Multi-buy?" />
+        </FormGroup>
+                <Button onClick={handleClose}>Close</Button>
         </DialogActions>
       </Dialog>
     </div>

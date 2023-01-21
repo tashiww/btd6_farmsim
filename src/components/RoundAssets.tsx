@@ -10,20 +10,34 @@ import Asset from '../types/Asset'
 import Towers from '../config/Towers';
 import BuyTowerDialog from './BuyTowerDialog';
 import SellIcon from '@mui/icons-material/Sell';
+import UpgradeTowerDialog from './UpgradeTowerDialog';
 
 
-function AssetRow(props: {name: string, towerIndex?: number, sellValue: number,upgradable: boolean, salable: boolean, sellTower?: any, }) {
+function AssetRow(props: {name: string, upgradeTower: any, currentRound?: number, assetIndex?: number, asset?: Asset, sellValue: number,upgradable: boolean, salable: boolean, sellTower?: any, }) {
 	return (
 		<tr>
 			<td>{props.name}</td>
 			<td>{props.sellValue}</td>
-			<td><Button disabled={!props.upgradable} variant="outlined" sx={{fontSize: 14}}>+</Button></td>
-			<td><Button data-sell_value={props.sellValue} data-tower_index={props.towerIndex} endIcon={<SellIcon />} onClick={props.sellTower} disabled={!props.salable} variant="outlined" sx={{fontSize: 14}}>×</Button></td>
+			<td><UpgradeTowerDialog upgradable={props.upgradable} asset={props.asset!} assetIndex={props.assetIndex!} currentRound={props.currentRound!} upgradeTower={props.upgradeTower} /></td>
+			<td><Button data-sell_value={props.sellValue} data-asset_index={props.assetIndex} endIcon={<SellIcon />}
+			 onClick={props.sellTower} disabled={!props.salable} variant="outlined" sx={{fontSize: 14}}>×</Button></td>
 	</tr>
 	);
 }
 
-function AssetTable(props: {validAssetList: Asset[], sellTower: any,}) {
+function getSellValue(asset: Asset, favoredTrades?: boolean) {
+	const towerId = asset.towerId;
+	let totalCost = Towers[towerId].cost;
+	asset.upgrades.forEach((tier: number, path: number) => {
+		for(let i=0; i<tier;i++) {
+			totalCost += Towers[towerId].upgrades[path][i].cost;
+		}
+	});
+	return Math.round(totalCost * 0.75 / 5) * 5;
+
+
+}
+function AssetTable(props: {validAssetList: Asset[], upgradeTower: any, sellTower: any, currentRound: number, }) {
 
 	let assetRows: JSX.Element[] = [];
 	let totalAssetValue = 0;
@@ -31,12 +45,12 @@ function AssetTable(props: {validAssetList: Asset[], sellTower: any,}) {
 		let salable = true;
 		let upgradable = asset.upgrades.reduce((a, b) => a + b, 0) < 7;
 		let name = asset.upgrades.join('') + ' ' + Towers[asset.towerId].name;
-		let sellValue = Math.round(asset.purchasedPrice * 0.75 / 5) * 5;
+		const sellValue = getSellValue(asset);
 		totalAssetValue += sellValue;
-		assetRows.push(<AssetRow key={index} towerIndex={asset.index} sellValue={sellValue} name={name} upgradable={upgradable} sellTower={props.sellTower} salable={salable} />);
+		assetRows.push(<AssetRow key={index} currentRound={props.currentRound} assetIndex={asset.index} asset={asset} sellValue={sellValue} name={name} upgradable={upgradable} upgradeTower={props.upgradeTower} sellTower={props.sellTower} salable={salable} />);
 	});
 	let assetCount = props.validAssetList.length;
-	assetRows.push(<AssetRow key={assetCount} sellValue={totalAssetValue} name={'Total for ' + assetCount + ' towers'} upgradable={false} salable={false} />);
+	assetRows.push(<AssetRow upgradeTower={props.upgradeTower} key={assetCount} sellValue={totalAssetValue} name={'Total for ' + assetCount + ' towers'} upgradable={false} salable={false} />);
 
 	return (
 		<table>
@@ -55,7 +69,8 @@ function AssetTable(props: {validAssetList: Asset[], sellTower: any,}) {
 	);
 }
 
-export default function RoundAssets(props: {currentRound: number, assetList: Asset[], addTower: any, sellTower: any,}) {
+export default function RoundAssets(props: {currentRound: number, assetList: Asset[], 
+										addTower: any, sellTower: any, upgradeTower: any,}) {
   const [open, setOpen] = React.useState(false);
 
   const handleClickOpen = () => {
@@ -84,7 +99,7 @@ export default function RoundAssets(props: {currentRound: number, assetList: Ass
       <Dialog className='RoundAssets' open={open} onClose={handleClose}>
         <DialogTitle>Round {props.currentRound} Asset List</DialogTitle>
         <DialogContent>
-			<AssetTable sellTower={props.sellTower} validAssetList={roundAssets} />
+			<AssetTable currentRound={props.currentRound} upgradeTower={props.upgradeTower} sellTower={props.sellTower} validAssetList={roundAssets} />
             </DialogContent>
         <DialogActions>
 			<BuyTowerDialog addTower={props.addTower} currentRound={props.currentRound}  />
